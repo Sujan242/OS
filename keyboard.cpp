@@ -6,11 +6,11 @@ KeyboardDriver::KeyboardDriver(InterruptManager* manager)
 dataport(0x60),
 commandport(0x64)
 {
-    while(commandport.Read() & 0x1)
+    while(commandport.Read() & 0x1)   // Wait for user to release the key if he is pressing it now
         dataport.Read();
-    commandport.Write(0xae); // activate interrupts
-    commandport.Write(0x20); // command 0x20 = read controller command byte
-    uint8_t status = (dataport.Read() | 1) & ~0x10;
+    commandport.Write(0xae); // activate interrupts . Tells PIC to accept interupts.
+    commandport.Write(0x20); // command 0x20 =ask for controller command byte
+    uint8_t status = (dataport.Read() | 1) & ~0x10; // read controller command byte
     commandport.Write(0x60); // command 0x60 = set controller command byte
     dataport.Write(status);
     dataport.Write(0xf4);
