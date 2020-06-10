@@ -5,9 +5,10 @@
 #include "keyboard.h"
 
 
-void printf(char* str)
+void printf(char* str)  //we have to define our own printf function as there are no libraries yet
 {
-    static uint16_t* VideoMemory = (uint16_t*)0xb8000;
+    static uint16_t* VideoMemory = (uint16_t*)0xb8000;  //OS dynamically links the function call to the library
+
 
     static uint8_t x=0,y=0;
 
@@ -24,7 +25,7 @@ void printf(char* str)
                 x++;
                 break;
         }
-
+         // if number of print statements exceed the screen size, we clear all and start printing again
         if(x >= 80)
         {
             x = 0;
@@ -47,7 +48,7 @@ void printf(char* str)
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
 extern "C" constructor end_ctors;
-extern "C" void callConstructors()
+extern "C" void callConstructors()  //initialise objects
 {
     for(constructor* i = &start_ctors; i != &end_ctors; i++)
         (*i)();
@@ -56,10 +57,11 @@ extern "C" void callConstructors()
 
 
 extern "C" void kernelMain(const void* multiboot_structure, uint32_t /*multiboot_magic*/)
-{
-    printf("Hello World! --- http://www.AlgorithMan.de");
+{   //g++ has a different naming convention
+    //hence while writing into .o file changes name
+    printf("Hello World!");
 
-    GlobalDescriptorTable gdt;
+    GlobalDescriptorTable gdt;  //to prevent that extern is used
     InterruptManager interrupts(0x20, &gdt);
     KeyboardDriver keyboard(&interrupts);
     interrupts.Activate();
